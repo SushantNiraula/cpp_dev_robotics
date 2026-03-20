@@ -62,4 +62,39 @@ Your Goal:
 3. Observe that if you don't use `delete[]`, the memory stays "taken."
 
 
-. The Fix: Use `delete[]` to properly free that memory.
+4. The Fix: Use `delete[]` to properly free that memory.
+
+
+The Robotics Danger: A robot is designed to run for hours or days. A small leak of just 40 bytes (10 integers) every sensor cycle (say, 100 times per second) adds up to 14 MB per hour. After a day of autonomous flight, your drone's brain will freeze and fall out of the sky.
+
+### The Complications of Manual Management
+
+1. Relying on new and delete is "Old School" C++. It is dangerous for a few reasons:
+
+2. Dangling Pointers: If you delete a pointer but try to use it later, your program crashes.
+
+3. Double Free: If you try to delete the same memory twice, your program crashes.
+
+4. Exceptions: If an error happens between new and delete, the delete line might never be reached, causing a leak anyway.
+
+### The Modern Solution: Smart Pointers
+In modern robotics (and the Pico 2 SDK/ROS2), we prefer Smart Pointers (like std::unique_ptr). These are objects that live on the Stack but manage memory on the Heap. When the object on the stack is destroyed, it automatically calls delete for you. It's like a tool that puts itself back in the warehouse!
+
+## Phase 1 Milestone: The Sensor Circular Buffer
+You are now ready for your first big project.
+
+The "Why": Robots often need the "last 10 seconds" of Lidar data. We don't want to keep allocating and deleting memory (which is slow). Instead, we use a Circular Buffer—a fixed-size array where new data overwrites the oldest data.
+
+Your Goal:
+
+1. Create a fixed-size array of double (representing distance readings).
+
+2. Use a pointer to track the "Head" (where the next piece of data goes).
+
+3. Write a function addReading(double newValue) that:
+
+    * Places the value at the current "Head."
+
+    * Moves the "Head" to the next spot.
+
+    * Crucial: If the "Head" reaches the end of the array, it must "wrap around" back to the first element.
